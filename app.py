@@ -22,7 +22,7 @@ fc_parameters = model.fc.parameters()
 
 for param in fc_parameters:
     param.requires_grad = True
-model.load_state_dict(torch.load('checkpoints.pt',map_location='cpu'))
+model.load_state_dict(torch.load('/home/ubuntu/checkpoints.pt',map_location='cpu'))
 criterion = nn.CrossEntropyLoss()
 def load_input_image(img_path):    
     image = Image.open(img_path)
@@ -67,14 +67,17 @@ def label():
             f = request.files['file']
             f.save(os.path.join(app.config['UPLOAD_FOLDER'],f.filename))
             path = app.config['UPLOAD_FOLDER']+'/'+f.filename
-    img_path = np.array(glob(path))
-    img = Image.open(img_path)
-    if predict_malaria(model, class_names, img_path) == 'Parasitized':
-        return "Infected"
-    else:
-        return "Un-Infected"
+            img_path = np.array(glob(path))
+            img = Image.open(img_path)
+            if predict_malaria(model, class_names, img_path) == 'Parasitized':
+                return "Infected"
+            else:
+                return "Un-Infected"
+        except:
+            print("error")
 
 @app.route('/', methods=['GET','POST'])
+def home():
     return render_template("index.html") #display the html template
 
 if __name__=='__main__':
